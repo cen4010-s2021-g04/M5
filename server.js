@@ -8,7 +8,7 @@ const db = require('./server/database')
 const userRoutes = require('./server/routes/user-routes');
 const authRoutes = require('./server/routes/auth-routes');
 const messangerRoutes = require('./server/routes/messanger-routes');
-
+const path = require('path');
 /********************** MAIN **********************/
 const app = express();
 const PORT = process.env.PORT || 5000; // run the server on either the existing env port or 5000 if not available
@@ -35,6 +35,15 @@ app.use('/', messangerRoutes);
 app.use(cors());
 
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
+
+// serve static assests if in production
+if (process.env.NODE_ENV === 'production') {
+    // set static folder
+    app.use(express.static('client/build'));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    });
+}
 
 app.get('/', (req, res) => {
     res.send('Learning the MERN Stack');
